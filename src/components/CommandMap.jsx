@@ -51,7 +51,19 @@ export default function CommandMap({
     routesLayerGroupRef.current = L.layerGroup().addTo(map);
     mapInstanceRef.current = map;
 
+    const refreshMapSize = () => {
+      requestAnimationFrame(() => map.invalidateSize({ animate: false }));
+    };
+    const resizeObserver = new ResizeObserver(refreshMapSize);
+    resizeObserver.observe(mapContainerRef.current);
+    window.addEventListener('orientationchange', refreshMapSize);
+    window.addEventListener('resize', refreshMapSize);
+    refreshMapSize();
+
     return () => {
+      resizeObserver.disconnect();
+      window.removeEventListener('orientationchange', refreshMapSize);
+      window.removeEventListener('resize', refreshMapSize);
       map.remove();
       mapInstanceRef.current = null;
     };
@@ -253,7 +265,7 @@ export default function CommandMap({
     <div className="relative w-full h-full min-h-[500px] flex-1 rounded-xl overflow-hidden border border-tactical-border/80 bg-tactical-bg shadow-2xl">
       
       {/* Tactical Leaflet Map Canvas */}
-      <div ref={mapContainerRef} className="w-full h-full z-0" />
+      <div ref={mapContainerRef} className="command-map-canvas w-full h-full min-h-[500px] z-0" />
 
       {/* Radar Overlay Animation */}
       {radarActive && (
