@@ -32,11 +32,36 @@ export default function CommandMap({
       attributionControl: false
     });
 
-    // Dark Matter CartoDB tiles
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-      maxZoom: 19,
-      subdomains: 'abcd',
-    }).addTo(map);
+    // Free dark tile layers — NO API KEY REQUIRED
+    // Primary: Stadia Maps Alidade Smooth Dark (completely free, no key needed)
+    const stadiaLayer = L.tileLayer(
+      'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png',
+      {
+        maxZoom: 20,
+        minZoom: 2,
+        attribution: '&copy; <a href="https://stadia.maps.com">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a>',
+      }
+    );
+
+    // Fallback: OpenStreetMap standard (if Stadia is slow)
+    const osmLayer = L.tileLayer(
+      'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+      {
+        maxZoom: 19,
+        attribution: '&copy; OpenStreetMap contributors',
+        opacity: 0.25, // Darken by lowering opacity over black background
+      }
+    );
+
+    // Try Stadia first, if tiles fail automatically fallback to OSM
+    stadiaLayer.on('tileerror', function() {
+      if (map && !osmLayer._map) {
+        map.removeLayer(stadiaLayer);
+        osmLayer.addTo(map);
+      }
+    });
+
+    stadiaLayer.addTo(map);
 
     L.control.zoom({ position: 'bottomright' }).addTo(map);
 
