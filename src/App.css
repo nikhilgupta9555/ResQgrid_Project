@@ -1,0 +1,31 @@
+/* ResQGrid custom animation helpers */
+@keyframes beaconPing {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.9;
+  }
+  70% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+
+.custom-beacon-pulse {
+  position: relative;
+}
+
+.custom-beacon-pulse::after {
+  content: '';
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  right: -4px;
+  bottom: -4px;
+  border-radius: 50%;
+  border: 2px solid #ef4444;
+  animation: beaconPing 2s cubic-bezier(0, 0.2, 0.8, 1) infinite;
+}
